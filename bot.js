@@ -108,52 +108,52 @@ client.on('interactionCreate', async interaction => {
         let resultado;
         
         if (interaction.customId === 'modal_com_parceria') {
-            // Com parceria: 25% facção, 75% cliente
-            const valorLimpo = valorSujo * 0.75; // 75% do valor sujo
-            const valorFaccao = valorLimpo * 0.25; // 25% do valor limpo
-            const valorMaquininha = valorFaccao * (5/25); // 5% da parte da facção
-            const valorFuncionario = valorFaccao * (5/25);
-            const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
-            const valorCliente = valorLimpo * 0.75;
+            // Com parceria: 75% cliente, 15% facção, 5% maquininha, 5% funcionário
+            const valorCliente = valorSujo * 0.75;
+            const valorFaccao = valorSujo * 0.15;
+            const valorMaquininha = valorSujo * 0.05;
+            const valorFuncionario = valorSujo * 0.05;
 
             resultado = {
                 valorSujo: valorSujo,
-                valorLimpo: valorLimpo,
                 cliente: valorCliente,
-                faccao: valorFaccaoLiquido,
+                faccao: valorFaccao,
                 maquininha: valorMaquininha,
-                funcionario: valorFuncionario
+                funcionario: valorFuncionario,
+                taxaLavagem: "15%"
             };
         } else {
-            // Sem parceria: 30% facção, 70% cliente
-            const valorLimpo = valorSujo * 0.70; // 70% do valor sujo
-            const valorFaccao = valorLimpo * 0.30; // 30% do valor limpo
-            const valorMaquininha = valorFaccao * (5/30); // 5% da parte da facção
-            const valorFuncionario = valorFaccao * (5/30);
-            const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
-            const valorCliente = valorLimpo * 0.70;
+            // Sem parceria: 70% cliente, 20% facção, 5% maquininha, 5% funcionário
+            const valorCliente = valorSujo * 0.70;
+            const valorFaccao = valorSujo * 0.20;
+            const valorMaquininha = valorSujo * 0.05;
+            const valorFuncionario = valorSujo * 0.05;
 
             resultado = {
                 valorSujo: valorSujo,
-                valorLimpo: valorLimpo,
                 cliente: valorCliente,
-                faccao: valorFaccaoLiquido,
+                faccao: valorFaccao,
                 maquininha: valorMaquininha,
-                funcionario: valorFuncionario
+                funcionario: valorFuncionario,
+                taxaLavagem: "20%"
             };
         }
 
-        const resposta = `**Relatório Detalhado da Lavagem**
-💸 Valor Sujo (Painel): ${formatarDinheiro(resultado.valorSujo)}
-💰 Valor Limpo (Após Lavagem): ${formatarDinheiro(resultado.valorLimpo)}
-\n📊 **Distribuição:**
-👤 Valor do Cliente: ${formatarDinheiro(resultado.cliente)}
-🏢 Valor da Facção: ${formatarDinheiro(resultado.faccao)}
-💳 Taxa Maquininha (5%): ${formatarDinheiro(resultado.maquininha)}
-👷 Taxa Funcionário: ${formatarDinheiro(resultado.funcionario)}
-\n📈 **Resumo:**
-📉 Retirado do Painel: ${formatarDinheiro(resultado.valorSujo)}
-💱 Taxa de Lavagem: ${interaction.customId === 'modal_com_parceria' ? '25%' : '30%'}`;
+        const resposta = `**Relatório de Lavagem** ${interaction.customId === 'modal_com_parceria' ? '(Com Parceria)' : '(Sem Parceria)'}
+💸 **Valor do Painel:** ${formatarDinheiro(resultado.valorSujo)}
+
+📊 **Distribuição:**
+\`\`\`
+┌─────────────┬────────────────┬─────────┐
+│   Destino   │    Valor      │   (%)   │
+├─────────────┼────────────────┼─────────┤
+│ Cliente     │ ${formatarDinheiro(resultado.cliente).padEnd(12)} │   ${interaction.customId === 'modal_com_parceria' ? '75%' : '70%'}   │
+│ Facção      │ ${formatarDinheiro(resultado.faccao).padEnd(12)} │   ${resultado.taxaLavagem.padStart(3)}   │
+│ Maquininha  │ ${formatarDinheiro(resultado.maquininha).padEnd(12)} │    5%   │
+│ Funcionário │ ${formatarDinheiro(resultado.funcionario).padEnd(12)} │    5%   │
+└─────────────┴────────────────┴─────────┘
+\`\`\`
+💰 **Total:** ${formatarDinheiro(resultado.valorSujo)}`;
 
         await interaction.reply({
             content: resposta,

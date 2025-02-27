@@ -105,37 +105,36 @@ client.on('interactionCreate', async interaction => {
             return;
         }
 
-        // Calcula o valor após descontar taxas de maquininha e funcionário
-        const valorMaquininha = valorPainel * 0.05;
-        const valorFuncionario = valorPainel * 0.05;
-        const valorAposDescontos = valorPainel - valorMaquininha - valorFuncionario;
-
         let resultado;
         
         if (interaction.customId === 'modal_com_parceria') {
             // Com parceria: 75% cliente, 15% facção
-            const valorCliente = valorAposDescontos * 0.75;
-            const valorFaccao = valorAposDescontos * 0.15;
+            const valorCliente = valorPainel * 0.75; // Cliente recebe 75% do valor total
+            const valorFaccao = valorPainel * 0.15; // 15% para a facção
+            const valorMaquininha = valorFaccao * (5/15); // 5% da parte da facção
+            const valorFuncionario = valorFaccao * (5/15); // 5% da parte da facção
+            const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
 
             resultado = {
                 valorPainel: valorPainel,
-                valorAposDescontos: valorAposDescontos,
                 cliente: valorCliente,
-                faccao: valorFaccao,
+                faccao: valorFaccaoLiquido,
                 maquininha: valorMaquininha,
                 funcionario: valorFuncionario,
                 taxaLavagem: "15%"
             };
         } else {
             // Sem parceria: 70% cliente, 20% facção
-            const valorCliente = valorAposDescontos * 0.70;
-            const valorFaccao = valorAposDescontos * 0.20;
+            const valorCliente = valorPainel * 0.70; // Cliente recebe 70% do valor total
+            const valorFaccao = valorPainel * 0.20; // 20% para a facção
+            const valorMaquininha = valorFaccao * (5/20); // 5% da parte da facção
+            const valorFuncionario = valorFaccao * (5/20); // 5% da parte da facção
+            const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
 
             resultado = {
                 valorPainel: valorPainel,
-                valorAposDescontos: valorAposDescontos,
                 cliente: valorCliente,
-                faccao: valorFaccao,
+                faccao: valorFaccaoLiquido,
                 maquininha: valorMaquininha,
                 funcionario: valorFuncionario,
                 taxaLavagem: "20%"
@@ -144,7 +143,6 @@ client.on('interactionCreate', async interaction => {
 
         const resposta = `**Relatório de Lavagem** ${interaction.customId === 'modal_com_parceria' ? '(Com Parceria)' : '(Sem Parceria)'}
 💸 **Valor do Painel:** ${formatarDinheiro(resultado.valorPainel)}
-💰 **Valor Após Taxas:** ${formatarDinheiro(resultado.valorAposDescontos)}
 
 📊 **Distribuição:**
 \`\`\`
@@ -157,7 +155,7 @@ client.on('interactionCreate', async interaction => {
 │ Funcionário │ ${formatarDinheiro(resultado.funcionario).padEnd(12)} │    5%   │
 └─────────────┴────────────────┴─────────┘
 \`\`\`
-💳 **Taxas Descontadas:** ${formatarDinheiro(resultado.maquininha + resultado.funcionario)} (10%)
+💳 **Taxas Descontadas:** ${formatarDinheiro(resultado.maquininha + resultado.funcionario)}
 💰 **Total:** ${formatarDinheiro(resultado.valorPainel)}`;
 
         await interaction.reply({

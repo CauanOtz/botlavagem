@@ -34,6 +34,16 @@ client.on('messageCreate', async message => {
     }
 });
 
+// Função para formatar números no estilo brasileiro
+function formatarDinheiro(valor) {
+    return valor.toLocaleString('pt-BR', { 
+        style: 'currency', 
+        currency: 'BRL',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+}
+
 client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
         const modal = new ModalBuilder()
@@ -42,9 +52,10 @@ client.on('interactionCreate', async interaction => {
 
         const valorInput = new TextInputBuilder()
             .setCustomId('valor_input')
-            .setLabel('Digite o valor a ser lavado:')
+            .setLabel('Digite o valor (ex: 1000 ou 1000.50):')
             .setStyle(TextInputStyle.Short)
-            .setRequired(true);
+            .setRequired(true)
+            .setPlaceholder('1000.50');
 
         const actionRow = new ActionRowBuilder().addComponents(valorInput);
         modal.addComponents(actionRow);
@@ -53,10 +64,14 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isModalSubmit()) {
-        const valor = parseFloat(interaction.fields.getTextInputValue('valor_input'));
+        const valorTexto = interaction.fields.getTextInputValue('valor_input').replace(',', '.');
+        const valor = parseFloat(valorTexto);
         
         if (isNaN(valor)) {
-            await interaction.reply('Por favor, insira um valor válido!');
+            await interaction.reply({ 
+                content: 'Por favor, insira um valor válido!\nExemplos: 1000 ou 1000.50', 
+                ephemeral: true 
+            });
             return;
         }
 
@@ -64,8 +79,8 @@ client.on('interactionCreate', async interaction => {
         if (interaction.customId === 'modal_com_parceria') {
             // Com parceria: 25% facção, 75% cliente
             const valorFaccao = valor * 0.25;
-            const valorMaquininha = valorFaccao * (5/25); // 5% do valor da facção
-            const valorFuncionario = valorFaccao * (5/25); // 5% do valor da facção
+            const valorMaquininha = valorFaccao * (5/25);
+            const valorFuncionario = valorFaccao * (5/25);
             const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
             const valorCliente = valor * 0.75;
 
@@ -79,8 +94,8 @@ client.on('interactionCreate', async interaction => {
         } else {
             // Sem parceria: 30% facção, 70% cliente
             const valorFaccao = valor * 0.30;
-            const valorMaquininha = valorFaccao * (5/30); // 5% do valor da facção
-            const valorFuncionario = valorFaccao * (5/30); // 5% do valor da facção
+            const valorMaquininha = valorFaccao * (5/30);
+            const valorFuncionario = valorFaccao * (5/30);
             const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
             const valorCliente = valor * 0.70;
 
@@ -94,11 +109,11 @@ client.on('interactionCreate', async interaction => {
         }
 
         const resposta = `**Resultado da Lavagem**
-Valor Total: $${resultado.total.toFixed(2)}
-Valor do Cliente: $${resultado.cliente.toFixed(2)}
-Valor da Facção: $${resultado.faccao.toFixed(2)}
-Valor da Maquininha: $${resultado.maquininha.toFixed(2)}
-Valor do Funcionário: $${resultado.funcionario.toFixed(2)}`;
+Valor Total: ${formatarDinheiro(resultado.total)}
+Valor do Cliente: ${formatarDinheiro(resultado.cliente)}
+Valor da Facção: ${formatarDinheiro(resultado.faccao)}
+Valor da Maquininha: ${formatarDinheiro(resultado.maquininha)}
+Valor do Funcionário: ${formatarDinheiro(resultado.funcionario)}`;
 
         await interaction.reply({
             content: resposta,

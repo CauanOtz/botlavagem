@@ -82,7 +82,7 @@ client.on('interactionCreate', async interaction => {
 
         const valorInput = new TextInputBuilder()
             .setCustomId('valor_input')
-            .setLabel('Digite o valor limpo (ex: 1000 ou 1000.50):')
+            .setLabel('Digite o valor do painel (valor sujo):')
             .setStyle(TextInputStyle.Short)
             .setRequired(true)
             .setPlaceholder('1000.50');
@@ -95,9 +95,9 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isModalSubmit()) {
         const valorTexto = interaction.fields.getTextInputValue('valor_input').replace(',', '.');
-        const valorLimpo = parseFloat(valorTexto);
+        const valorSujo = parseFloat(valorTexto);
         
-        if (isNaN(valorLimpo)) {
+        if (isNaN(valorSujo)) {
             await interaction.reply({ 
                 content: 'Por favor, insira um valor válido!\nExemplos: 1000 ou 1000.50', 
                 ephemeral: true 
@@ -106,21 +106,19 @@ client.on('interactionCreate', async interaction => {
         }
 
         let resultado;
-        let valorSujo;
-        let valorMaquininha;
         
         if (interaction.customId === 'modal_com_parceria') {
             // Com parceria: 25% facção, 75% cliente
-            valorSujo = valorLimpo / 0.75; // Valor original antes da lavagem (100%)
-            const valorFaccao = valorLimpo * 0.25;
-            valorMaquininha = valorFaccao * (5/25); // 5% da parte da facção
+            const valorLimpo = valorSujo * 0.75; // 75% do valor sujo
+            const valorFaccao = valorLimpo * 0.25; // 25% do valor limpo
+            const valorMaquininha = valorFaccao * (5/25); // 5% da parte da facção
             const valorFuncionario = valorFaccao * (5/25);
             const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
             const valorCliente = valorLimpo * 0.75;
 
             resultado = {
-                valorLimpo: valorLimpo,
                 valorSujo: valorSujo,
+                valorLimpo: valorLimpo,
                 cliente: valorCliente,
                 faccao: valorFaccaoLiquido,
                 maquininha: valorMaquininha,
@@ -128,16 +126,16 @@ client.on('interactionCreate', async interaction => {
             };
         } else {
             // Sem parceria: 30% facção, 70% cliente
-            valorSujo = valorLimpo / 0.70; // Valor original antes da lavagem (100%)
-            const valorFaccao = valorLimpo * 0.30;
-            valorMaquininha = valorFaccao * (5/30); // 5% da parte da facção
+            const valorLimpo = valorSujo * 0.70; // 70% do valor sujo
+            const valorFaccao = valorLimpo * 0.30; // 30% do valor limpo
+            const valorMaquininha = valorFaccao * (5/30); // 5% da parte da facção
             const valorFuncionario = valorFaccao * (5/30);
             const valorFaccaoLiquido = valorFaccao - valorMaquininha - valorFuncionario;
             const valorCliente = valorLimpo * 0.70;
 
             resultado = {
-                valorLimpo: valorLimpo,
                 valorSujo: valorSujo,
+                valorLimpo: valorLimpo,
                 cliente: valorCliente,
                 faccao: valorFaccaoLiquido,
                 maquininha: valorMaquininha,
@@ -146,15 +144,15 @@ client.on('interactionCreate', async interaction => {
         }
 
         const resposta = `**Relatório Detalhado da Lavagem**
-💰 Valor Limpo (Após Lavagem): ${formatarDinheiro(resultado.valorLimpo)}
 💸 Valor Sujo (Painel): ${formatarDinheiro(resultado.valorSujo)}
+💰 Valor Limpo (Após Lavagem): ${formatarDinheiro(resultado.valorLimpo)}
 \n📊 **Distribuição:**
 👤 Valor do Cliente: ${formatarDinheiro(resultado.cliente)}
 🏢 Valor da Facção: ${formatarDinheiro(resultado.faccao)}
 💳 Taxa Maquininha (5%): ${formatarDinheiro(resultado.maquininha)}
 👷 Taxa Funcionário: ${formatarDinheiro(resultado.funcionario)}
 \n📈 **Resumo:**
-📉 Retirado do Painel: ${formatarDinheiro(resultado.valorSujo - resultado.valorLimpo)}
+📉 Retirado do Painel: ${formatarDinheiro(resultado.valorSujo)}
 💱 Taxa de Lavagem: ${interaction.customId === 'modal_com_parceria' ? '25%' : '30%'}`;
 
         await interaction.reply({

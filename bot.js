@@ -56,7 +56,8 @@ client.on('messageCreate', async message => {
 💰 Valor Lavado: ${formatarDinheiro(valorLavado)}
 📊 Valor Painel: ${formatarDinheiro(valorPainel)}
 💸 Valor Pago: ${formatarDinheiro(valorPago)}
-\n📈 **Resultados:**
+
+📈 **Resultados:**
 💵 Lucro: ${formatarDinheiro(lucro)}
 📉 Diferença Painel: ${formatarDinheiro(diferenca)}`;
 

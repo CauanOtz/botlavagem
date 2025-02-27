@@ -109,7 +109,7 @@ client.on('interactionCreate', async interaction => {
         let resultado;
         
         if (interaction.customId === 'modal_com_parceria') {
-            // Com parceria: 75% cliente, 15% facção, 5% maquininha, 5% funcionário
+            // Com parceria: 75% cliente, 15% facção, 5% maquininha, 5% funcionário (25% total)
             const valorCliente = valorPainel * 0.75; // 75% para o cliente
             const valorFaccao = valorPainel * 0.15; // 15% para a facção
             const valorMaquininha = valorPainel * 0.05; // 5% para a maquininha
@@ -125,10 +125,11 @@ client.on('interactionCreate', async interaction => {
                 faccao: valorFaccao,
                 maquininha: valorMaquininha,
                 funcionario: valorFuncionario,
-                taxaLavagem: "15%"
+                taxaTotal: "25%",
+                taxaFaccao: "15%"
             };
         } else {
-            // Sem parceria: 70% cliente, 20% facção, 5% maquininha, 5% funcionário
+            // Sem parceria: 70% cliente, 20% facção, 5% maquininha, 5% funcionário (30% total)
             const valorCliente = valorPainel * 0.70; // 70% para o cliente
             const valorFaccao = valorPainel * 0.20; // 20% para a facção
             const valorMaquininha = valorPainel * 0.05; // 5% para a maquininha
@@ -144,11 +145,12 @@ client.on('interactionCreate', async interaction => {
                 faccao: valorFaccao,
                 maquininha: valorMaquininha,
                 funcionario: valorFuncionario,
-                taxaLavagem: "20%"
+                taxaTotal: "30%",
+                taxaFaccao: "20%"
             };
         }
 
-        const resposta = `**Relatório de Lavagem** ${interaction.customId === 'modal_com_parceria' ? '(Com Parceria)' : '(Sem Parceria)'}
+        const resposta = `**Relatório de Lavagem** ${interaction.customId === 'modal_com_parceria' ? '(Com Parceria - 25%)' : '(Sem Parceria - 30%)'}
 💸 **Valor do Painel:** ${formatarDinheiro(resultado.valorPainel)}
 💰 **Valor a Retirar (Cliente):** ${formatarDinheiro(resultado.valorRetirar)}
 💳 **Valor a Adicionar:** ${formatarDinheiro(resultado.valorAdicionar)}
@@ -159,12 +161,12 @@ client.on('interactionCreate', async interaction => {
 │   Destino   │    Valor      │   (%)   │
 ├─────────────┼────────────────┼─────────┤
 │ Cliente     │ ${formatarDinheiro(resultado.cliente).padEnd(12)} │   ${interaction.customId === 'modal_com_parceria' ? '75%' : '70%'}   │
-│ Facção      │ ${formatarDinheiro(resultado.faccao).padEnd(12)} │   ${resultado.taxaLavagem.padStart(3)}   │
+│ Facção      │ ${formatarDinheiro(resultado.faccao).padEnd(12)} │   ${resultado.taxaFaccao.padStart(3)}   │
 │ Maquininha  │ ${formatarDinheiro(resultado.maquininha).padEnd(12)} │    5%   │
 │ Funcionário │ ${formatarDinheiro(resultado.funcionario).padEnd(12)} │    5%   │
 └─────────────┴────────────────┴─────────┘
 \`\`\`
-💳 **Taxa Maquininha:** ${formatarDinheiro(resultado.maquininha)} (5%)`;
+💳 **Taxa Total:** ${resultado.taxaTotal} (${formatarDinheiro(resultado.faccao + resultado.maquininha + resultado.funcionario)})`;
 
         await interaction.reply({
             content: resposta,

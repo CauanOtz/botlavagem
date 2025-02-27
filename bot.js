@@ -12,8 +12,9 @@ client.once('ready', () => {
     console.log('Bot está online!');
 });
 
-client.on('interactionCreate', async interaction => {
-    if (interaction.isCommand() && interaction.commandName === 'lavar') {
+// Novo handler para mensagens normais
+client.on('messageCreate', async message => {
+    if (message.content === '!lavar') {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
@@ -26,12 +27,14 @@ client.on('interactionCreate', async interaction => {
                     .setStyle(ButtonStyle.Secondary)
             );
 
-        await interaction.reply({
+        await message.reply({
             content: 'Selecione o tipo de lavagem:',
             components: [row]
         });
     }
+});
 
+client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
         const modal = new ModalBuilder()
             .setCustomId(interaction.customId === 'com_parceria' ? 'modal_com_parceria' : 'modal_sem_parceria')

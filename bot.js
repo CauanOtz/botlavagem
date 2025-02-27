@@ -18,11 +18,11 @@ client.on('messageCreate', async message => {
         const row = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('com_parceria')
+                    .setCustomId('modal_com_parceria')
                     .setLabel('Com Parceria')
                     .setStyle(ButtonStyle.Primary),
                 new ButtonBuilder()
-                    .setCustomId('sem_parceria')
+                    .setCustomId('modal_sem_parceria')
                     .setLabel('Sem Parceria')
                     .setStyle(ButtonStyle.Secondary)
             );
@@ -78,7 +78,7 @@ function formatarDinheiro(valor) {
 client.on('interactionCreate', async interaction => {
     if (interaction.isButton()) {
         const modal = new ModalBuilder()
-            .setCustomId(interaction.customId === 'modal_com_parceria' ? 'modal_com_parceria' : 'modal_sem_parceria')
+            .setCustomId(interaction.customId)
             .setTitle('Valor para Lavagem');
 
         const valorInput = new TextInputBuilder()
@@ -110,12 +110,12 @@ client.on('interactionCreate', async interaction => {
         
         if (interaction.customId === 'modal_com_parceria') {
             // Com parceria: 75% cliente, 15% facção, 5% maquininha, 5% funcionário (25% total)
-            const valorCliente = valorPainel * 0.75; // 75% para o cliente
-            const valorFaccao = valorPainel * 0.15; // 15% para a facção
-            const valorMaquininha = valorPainel * 0.05; // 5% para a maquininha
-            const valorFuncionario = valorPainel * 0.05; // 5% para o funcionário
-            const valorRetirar = valorCliente; // Valor a ser retirado do painel para pagar o cliente
-            const valorAdicionar = valorPainel - valorMaquininha; // Valor a ser adicionado no painel (desconta maquininha)
+            const valorCliente = valorPainel * 0.75;
+            const valorFaccao = valorPainel * 0.15;
+            const valorMaquininha = valorPainel * 0.05;
+            const valorFuncionario = valorPainel * 0.05;
+            const valorRetirar = valorCliente;
+            const valorAdicionar = valorPainel - valorMaquininha;
 
             resultado = {
                 valorPainel: valorPainel,
@@ -130,12 +130,12 @@ client.on('interactionCreate', async interaction => {
             };
         } else {
             // Sem parceria: 70% cliente, 20% facção, 5% maquininha, 5% funcionário (30% total)
-            const valorCliente = valorPainel * 0.70; // 70% para o cliente
-            const valorFaccao = valorPainel * 0.20; // 20% para a facção
-            const valorMaquininha = valorPainel * 0.05; // 5% para a maquininha
-            const valorFuncionario = valorPainel * 0.05; // 5% para o funcionário
-            const valorRetirar = valorCliente; // Valor a ser retirado do painel para pagar o cliente
-            const valorAdicionar = valorPainel - valorMaquininha; // Valor a ser adicionado no painel (desconta maquininha)
+            const valorCliente = valorPainel * 0.70;
+            const valorFaccao = valorPainel * 0.20;
+            const valorMaquininha = valorPainel * 0.05;
+            const valorFuncionario = valorPainel * 0.05;
+            const valorRetirar = valorCliente;
+            const valorAdicionar = valorPainel - valorMaquininha;
 
             resultado = {
                 valorPainel: valorPainel,

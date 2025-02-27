@@ -32,6 +32,36 @@ client.on('messageCreate', async message => {
             components: [row]
         });
     }
+    
+    if (message.content.startsWith('!relatorio')) {
+        const linhas = message.content.split('\n');
+        if (linhas.length < 3) {
+            await message.reply('Por favor, forneça os valores no formato:\n!relatorio\nValor Lavado\nValor Painel\nValor Pago');
+            return;
+        }
+
+        const valorLavado = parseFloat(linhas[1].replace(/[^\d.-]/g, ''));
+        const valorPainel = parseFloat(linhas[2].replace(/[^\d.-]/g, ''));
+        const valorPago = parseFloat(linhas[3].replace(/[^\d.-]/g, ''));
+
+        if (isNaN(valorLavado) || isNaN(valorPainel) || isNaN(valorPago)) {
+            await message.reply('Por favor, forneça valores numéricos válidos.');
+            return;
+        }
+
+        const lucro = valorLavado - valorPago;
+        const diferenca = valorLavado - valorPainel;
+
+        const resposta = `**Relatório de Lavagem**
+💰 Valor Lavado: ${formatarDinheiro(valorLavado)}
+📊 Valor Painel: ${formatarDinheiro(valorPainel)}
+💸 Valor Pago: ${formatarDinheiro(valorPago)}
+\n📈 **Resultados:**
+💵 Lucro: ${formatarDinheiro(lucro)}
+📉 Diferença Painel: ${formatarDinheiro(diferenca)}`;
+
+        await message.reply(resposta);
+    }
 });
 
 // Função para formatar números no estilo brasileiro
